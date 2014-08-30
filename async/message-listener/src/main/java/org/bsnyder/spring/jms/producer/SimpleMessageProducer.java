@@ -36,10 +36,18 @@ public class SimpleMessageProducer {
         final StringBuilder buffer = new StringBuilder(); 
         
         for (int i = 0; i < numberOfMessages; ++i) {
+            buffer.setLength(0);
             buffer.append("Message '").append(i).append("' sent at: ").append(new Date());
             
             final int count = i;
             final String payload = buffer.toString();
+            
+            String s = String.valueOf(i);
+            int hash = 0;
+            for (int j = 0; j < s.length(); j++)
+            hash = (31 * hash + s.charAt(j)) % 10;
+            
+            jmsTemplate.setDefaultDestinationName("Request" + hash);
             
             jmsTemplate.send(new MessageCreator() {
                 public Message createMessage(Session session) throws JMSException {

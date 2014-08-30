@@ -1,32 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jms="http://www.springframework.org/schema/jms"
-  xmlns:p="http://www.springframework.org/schema/p"
-  xsi:schemaLocation="
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd">
 
-  <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-    p:brokerURL="tcp://localhost:61616" />
-  
-  <bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
-    <constructor-arg value="TEST.FOO" />
-  </bean>
+    <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+        <property name="environment">
+            <props>
+                <prop key="java.naming.provider.url">jnp://localhost:1099</prop>
+                <prop key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</prop>
+                <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop>
+            </props>
+        </property>
+    </bean>
     
-  <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"
-    p:connectionFactory-ref="connectionFactory"
-    p:defaultDestination-ref="destination" />
+    <bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiTemplate" ref ="jndiTemplate"/>
+        <property name="jndiName" value="/ConnectionFactory"/>
+    </bean>
   
-  <bean id="messageListener" class="org.bsnyder.spring.jms.listener.SimpleMessageListener" />
   
-  <!-- 
-    This is the Spring DefaultMessageListenerContainer (DMLC). All default values 
-    for the DMLC are used except for concurrency; By default the DMLC knows to use the 
-    bean whose name is connectionFactory.
-  -->
-  <jms:listener-container concurrency="5-10">
-    <jms:listener destination="TEST.FOO" ref="messageListener"/>
-  </jms:listener-container>
+    <bean id="destination" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiTemplate" ref="jndiTemplate"/>
+        <property name="jndiName" value="queue/Request"/>
+    </bean>
+    
+    
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"
+          p:connectionFactory-ref="connectionFactory"
+          p:defaultDestination-ref="destination" />
+  
+    <bean id="messageListener" class="org.bsnyder.spring.jms.listener.SimpleMessageListener" />
+  
+    <!-- 
+      This is the Spring DefaultMessageListenerContainer (DMLC). All default values 
+      for the DMLC are used except for concurrency; By default the DMLC knows to use the 
+      bean whose name is connectionFactory.
+    -->
+    <jms:listener-container concurrency="5-10">
+        <jms:listener destination="Request" ref="messageListener"/>
+        <jms:listener destination="Request0" ref="messageListener"/>
+        <jms:listener destination="Request1" ref="messageListener"/>
+        <jms:listener destination="Request2" ref="messageListener"/>
+        <jms:listener destination="Request3" ref="messageListener"/>
+        <jms:listener destination="Request4" ref="messageListener"/>
+        <jms:listener destination="Request5" ref="messageListener"/>
+        <jms:listener destination="Request6" ref="messageListener"/>
+        <jms:listener destination="Request7" ref="messageListener"/>
+        <jms:listener destination="Request8" ref="messageListener"/>
+        <jms:listener destination="Request9" ref="messageListener"/>
+        
+    </jms:listener-container>
 
 </beans>
