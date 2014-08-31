@@ -10,22 +10,27 @@
     <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
         <property name="environment">
             <props>
+                <!--
                 <prop key="java.naming.provider.url">jnp://localhost:1099</prop>
                 <prop key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</prop>
-                <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop>
+                <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop> -->
+                  <prop key="java.naming.factory.initial">oracle.jms.AQjmsInitialContextFactory</prop>
+                <prop key="db_url">jdbc:oracle:thin:@oel64.local:1521:xe</prop>
+                <prop key="java.naming.security.principal">aqadmin</prop>
+                <prop key="java.naming.security.credentials">aqadmin</prop>
             </props>
         </property>
     </bean>
     
     <bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
         <property name="jndiTemplate" ref ="jndiTemplate"/>
-        <property name="jndiName" value="/ConnectionFactory"/>
+        <property name="jndiName" value="QueueConnectionFactory"/>
     </bean>
   
   
     <bean id="destination" class="org.springframework.jndi.JndiObjectFactoryBean">
         <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="queue/Request"/>
+        <property name="jndiName" value="Queues/DEMO_QUEUE0"/>
     </bean>
     
     
@@ -40,18 +45,12 @@
       for the DMLC are used except for concurrency; By default the DMLC knows to use the 
       bean whose name is connectionFactory.
     -->
-    <jms:listener-container concurrency="5-10">
-        <jms:listener destination="Request" ref="messageListener"/>
-        <jms:listener destination="Request0" ref="messageListener"/>
-        <jms:listener destination="Request1" ref="messageListener"/>
-        <jms:listener destination="Request2" ref="messageListener"/>
-        <jms:listener destination="Request3" ref="messageListener"/>
-        <jms:listener destination="Request4" ref="messageListener"/>
-        <jms:listener destination="Request5" ref="messageListener"/>
-        <jms:listener destination="Request6" ref="messageListener"/>
-        <jms:listener destination="Request7" ref="messageListener"/>
-        <jms:listener destination="Request8" ref="messageListener"/>
-        <jms:listener destination="Request9" ref="messageListener"/>
+    <jms:listener-container concurrency="1-2">
+        <jms:listener destination="DEMO_QUEUE0" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE1" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE2" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE3" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE4" ref="messageListener"/>
         
     </jms:listener-container>
 

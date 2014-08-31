@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-producer</actionName>
+            <displayName>producer</displayName>
+            <goals>
+                <goal>exec:java</goal>
+            </goals>
+            <properties>
+                <mainClass>ProducerApp</mainClass>
+                <oracle.jms.traceLevel>6</oracle.jms.traceLevel>
+            </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-consumer</actionName>
+            <displayName>consumer</displayName>
+            <goals>
+                <goal>exec:java</goal>
+            </goals>
+            <properties>
+                <exec.mainClass>org.bsnyder.spring.jms.ConsumerApp</exec.mainClass>
+                <oracle.jms.traceLevel>6</oracle.jms.traceLevel>
+            </properties>
+        </action>
+    </actions>

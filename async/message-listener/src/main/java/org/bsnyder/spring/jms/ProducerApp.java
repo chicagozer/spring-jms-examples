@@ -26,7 +26,7 @@ public class ProducerApp {
      * @param args
      * @throws JMSException
      */
-    public static void main(String[] args) throws JMSException {
+    public static void main(String[] args) throws Exception {
     	ApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/spring/producer-jms-context.xml", ProducerApp.class);
         SimpleMessageProducer producer = (SimpleMessageProducer) context.getBean("messageProducer");
         producer.sendMessages();
