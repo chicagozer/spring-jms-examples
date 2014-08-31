@@ -14,7 +14,7 @@
                 <prop key="java.naming.provider.url">jnp://localhost:1099</prop>
                 <prop key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</prop>
                 <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop> -->
-                  <prop key="java.naming.factory.initial">oracle.jms.AQjmsInitialContextFactory</prop>
+                <prop key="java.naming.factory.initial">oracle.jms.AQjmsInitialContextFactory</prop>
                 <prop key="db_url">jdbc:oracle:thin:@oel64.local:1521:xe</prop>
                 <prop key="java.naming.security.principal">aqadmin</prop>
                 <prop key="java.naming.security.credentials">aqadmin</prop>
@@ -51,7 +51,11 @@
         <jms:listener destination="DEMO_QUEUE2" ref="messageListener"/>
         <jms:listener destination="DEMO_QUEUE3" ref="messageListener"/>
         <jms:listener destination="DEMO_QUEUE4" ref="messageListener"/>
-        
+        <jms:listener destination="DEMO_QUEUE5" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE6" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE7" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE8" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE9" ref="messageListener"/>
     </jms:listener-container>
 
 </beans>

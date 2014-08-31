@@ -31,64 +31,10 @@
     </bean>
   
   
-    <bean id="destination0" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE0"/>
-    </bean>
-    
-    <bean id="destination1" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE1"/>
-    </bean>
-
-    
-    <bean id="destination2" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE2"/>
-    </bean> 
-    
    
-    
-    <bean id="destination3" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE3"/>
-    </bean> 
-    
-  
-    <bean id="destination4" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE4"/>
-    </bean>
-    
-    <bean id="destination5" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE5"/>
-    </bean>
-
-    
-    <bean id="destination6" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE6"/>
-    </bean> 
-    
-    <bean id="destination7" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE7"/>
-    </bean> 
-    
-    <bean id="destination8" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE8"/>
-    </bean> 
-    
-    <bean id="destination9" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiTemplate" ref="jndiTemplate"/>
-        <property name="jndiName" value="Queues/DEMO_QUEUE9"/>
-    </bean> 
       
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"
-          p:connectionFactory-ref="connectionFactory"
-          p:defaultDestination-ref="destination1" />
+          p:connectionFactory-ref="connectionFactory" />
   
     <bean id="messageProducer" class="org.bsnyder.spring.jms.producer.SimpleMessageProducer"
           p:jmsTemplate-ref="jmsTemplate">
