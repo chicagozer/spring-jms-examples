@@ -51,11 +51,11 @@
             <artifactId>jnp-client</artifactId>
             <version>4.2.2.GA</version>
         </dependency>
-    <dependency>
-	<groupId>javax.transaction</groupId>
-	<artifactId>jta</artifactId>
-	<version>1.1</version>
-</dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+        </dependency>
         <dependency>
             <groupId>oracle</groupId>  
             <artifactId>ojdbc6</artifactId>  
@@ -68,10 +68,16 @@
             <version>11.2.0.4.0</version> 
         </dependency>
         
-            <dependency>
+        <dependency>
             <groupId>oracle</groupId>  
             <artifactId>xdb</artifactId>  
             <version>11.2.0.4.0</version> 
+        </dependency>
+        
+        <dependency>
+            <groupId>com.oracle.xml</groupId>
+            <artifactId>oracle.xml</artifactId>
+            <version>11.2.0.1</version>
         </dependency>
     </dependencies>
 

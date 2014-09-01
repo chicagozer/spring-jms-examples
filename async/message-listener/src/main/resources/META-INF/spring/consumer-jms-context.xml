@@ -33,18 +33,37 @@
         <property name="jndiName" value="Queues/DEMO_QUEUE0"/>
     </bean>
     
-    
+    <!--
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"
           p:connectionFactory-ref="connectionFactory"
-          p:defaultDestination-ref="destination" />
+            p:defaultDestination-ref="destination" 
+    />
+    -->
   
     <bean id="messageListener" class="org.bsnyder.spring.jms.listener.SimpleMessageListener" />
+  
+     <bean id="xmlMessageListener" class="org.bsnyder.spring.jms.listener.XMLMessageListener" />
   
     <!-- 
       This is the Spring DefaultMessageListenerContainer (DMLC). All default values 
       for the DMLC are used except for concurrency; By default the DMLC knows to use the 
       bean whose name is connectionFactory.
     -->
+    <!--
+    <jms:listener-container concurrency="1-2"
+    container-class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer">
+         <jms:listener destination="DEMO_XQUEUE0" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE1" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE2" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE3" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE4" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE5" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE6" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE7" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE8" ref="xmlMessageListener"/>
+        <jms:listener destination="DEMO_XQUEUE9" ref="xmlMessageListener"/> 
+    </jms:listener-container>
+    
     <jms:listener-container concurrency="1-2">
         <jms:listener destination="DEMO_QUEUE0" ref="messageListener"/>
         <jms:listener destination="DEMO_QUEUE1" ref="messageListener"/>
@@ -55,7 +74,115 @@
         <jms:listener destination="DEMO_QUEUE6" ref="messageListener"/>
         <jms:listener destination="DEMO_QUEUE7" ref="messageListener"/>
         <jms:listener destination="DEMO_QUEUE8" ref="messageListener"/>
-        <jms:listener destination="DEMO_QUEUE9" ref="messageListener"/>
+        <jms:listener destination="DEMO_QUEUE9" ref="messageListener"/> 
+       
     </jms:listener-container>
 
+    -->
+
+    <bean id="dmlc" abstract="true">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="sessionTransacted" value="true"/>
+        <property name="concurrentConsumers" value="1"/>
+        <property name="maxConcurrentConsumers" value="2"/>
+    </bean>
+     
+    <bean id="dmlcsimple" abstract="true" parent="dmlc">
+        <property name="messageListener" ref="messageListener" />
+    </bean>
+     
+    <bean id="dmlcxml" abstract="true" parent="dmlc">
+        <property name="messageListener" ref="xmlMessageListener" />
+    </bean>
+
+   
+    
+  <bean id="jmsContainer1" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE1"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer2" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE2"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer3" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE3"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer4" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE4"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer5" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE5"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer6" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE6"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer7" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE7"/>
+        
+    </bean>
+    <bean id="jmsContainer8" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE8"/>
+        
+    </bean>
+    <bean id="jmsContainer9" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE9"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer0" class="org.springframework.jms.listener.DefaultMessageListenerContainer" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE0"/>
+        
+    </bean>
+    
+    <bean id="xjmsContainer0" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE0"/>
+    </bean>
+     
+    <bean id="xjmsContainer1" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE1"/>
+    </bean>
+ 
+    <bean id="xjmsContainer2" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE2"/>
+    </bean>
+ 
+    <bean id="xjmsContainer3" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE3"/>
+    </bean>
+ 
+    <bean id="xjmsContainer4" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE4"/>
+    </bean>
+ 
+    <bean id="xjmsContainer5" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE5"/>
+    </bean>
+ 
+    <bean id="xjmsContainer6" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE6"/>
+    </bean>
+ 
+    <bean id="xjmsContainer7" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE7"/>
+    </bean>
+ 
+    <bean id="xjmsContainer8" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE8"/>
+    </bean>
+    <bean id="xjmsContainer9" class="org.bsnyder.spring.jms.listener.AQCustomPayloadMessageListenerContainer" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE9"/>
+    </bean>
+    
+    
 </beans>

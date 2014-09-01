@@ -38,7 +38,12 @@
   
     <bean id="messageProducer" class="org.bsnyder.spring.jms.producer.SimpleMessageProducer"
           p:jmsTemplate-ref="jmsTemplate">
+        <property name="jndiTemplate" ref="jndiTemplate"></property>
+    </bean>
     
+      <bean id="xmlMessageProducer" class="org.bsnyder.spring.jms.producer.XMLSimpleMessageProducer"
+          p:jmsTemplate-ref="jmsTemplate">   
+        
         <property name="jndiTemplate" ref="jndiTemplate"></property>
     </bean>
   
