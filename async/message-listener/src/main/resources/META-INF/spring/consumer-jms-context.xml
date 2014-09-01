@@ -84,7 +84,7 @@
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="sessionTransacted" value="true"/>
         <property name="concurrentConsumers" value="1"/>
-        <property name="maxConcurrentConsumers" value="2"/>
+        <property name="maxConcurrentConsumers" value="4"/>
     </bean>
      
     <bean id="dmlcsimple" abstract="true" parent="dmlc">

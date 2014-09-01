@@ -30,7 +30,7 @@ public class XMLSimpleMessageProducer {
         this.jndiTemplate = jndiTemplate;
     }
 
-    protected int numberOfMessages = 10;
+    protected int numberOfMessages = 100;
 
     public void setNumberOfMessages(int numberOfMessages) {
         this.numberOfMessages = numberOfMessages;
