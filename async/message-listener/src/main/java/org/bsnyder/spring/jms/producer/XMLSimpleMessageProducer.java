@@ -69,7 +69,9 @@ public class XMLSimpleMessageProducer {
             final int count = i;
             final String payload = buffer.toString();
    
-            //jmsTemplate.convertAndSend(q, payload);
+            jmsTemplate.convertAndSend(q, payload);
+            LOG.info("Sending message number '{}' queue '{}'", count,q);
+            /*
             jmsTemplate.send(q, new MessageCreator() {
                 public Message createMessage(Session session) throws JMSException {
 
@@ -97,7 +99,7 @@ public class XMLSimpleMessageProducer {
                     }
 
                 }
-            });
+            });*/
         }
     }
 

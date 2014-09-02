@@ -35,14 +35,28 @@
       
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"
           p:connectionFactory-ref="connectionFactory" />
+    
+    
+    <bean id="xmljmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/> 
+        <property name="messageConverter">
+            <bean id="messageConverter"
+                class="org.springframework.data.jdbc.jms.support.converter.oracle.XmlMessageConverter">
+                <constructor-arg>
+                    <bean class="org.springframework.data.jdbc.support.oracle.StringXmlTypeHandler"/> 
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+    
   
     <bean id="messageProducer" class="org.bsnyder.spring.jms.producer.SimpleMessageProducer"
           p:jmsTemplate-ref="jmsTemplate">
         <property name="jndiTemplate" ref="jndiTemplate"></property>
     </bean>
     
-      <bean id="xmlMessageProducer" class="org.bsnyder.spring.jms.producer.XMLSimpleMessageProducer"
-          p:jmsTemplate-ref="jmsTemplate">   
+    <bean id="xmlMessageProducer" class="org.bsnyder.spring.jms.producer.XMLSimpleMessageProducer"
+            p:jmsTemplate-ref="xmljmsTemplate">   
         
         <property name="jndiTemplate" ref="jndiTemplate"></property>
     </bean>
