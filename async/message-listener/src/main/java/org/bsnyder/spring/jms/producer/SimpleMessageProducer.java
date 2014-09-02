@@ -1,6 +1,5 @@
 package org.bsnyder.spring.jms.producer;
 
-import java.util.Date;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -68,12 +67,13 @@ public class SimpleMessageProducer {
             //jmsTemplate.setDefaultDestination(d);
             final String q = "DEMO_QUEUE" + hash;
             
-             buffer.append("<this>is xml. count:" + i + " q:" + q + "</this>");
+             buffer.append("<this>is xml. count:").append(i).append(" q:").append(q).append("</this>");
             final int count = i;
             final String payload = buffer.toString();
             
             
             jmsTemplate.send(q, new MessageCreator() {
+                @Override
                 public Message createMessage(Session session) throws JMSException {
                     TextMessage message = session.createTextMessage(payload);
                     message.setIntProperty("messageCount", count);

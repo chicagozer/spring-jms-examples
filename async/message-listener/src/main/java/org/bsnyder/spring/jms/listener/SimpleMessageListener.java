@@ -12,6 +12,7 @@ public class SimpleMessageListener implements MessageListener {
     
     private static final Logger LOG = LoggerFactory.getLogger(SimpleMessageListener.class);
 
+    @Override
     public void onMessage(Message message) {
         try {
             LOG.info("Received message: {}", ((TextMessage)message).getText());

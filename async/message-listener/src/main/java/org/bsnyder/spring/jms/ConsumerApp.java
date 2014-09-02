@@ -24,6 +24,7 @@ public class ConsumerApp {
      * Run the app and tell the producer to send its messages. 
      * 
      * @param args
+     * @throws java.lang.InterruptedException
      * @throws JMSException
      */
     public static void main(String[] args) throws InterruptedException,JMSException {
