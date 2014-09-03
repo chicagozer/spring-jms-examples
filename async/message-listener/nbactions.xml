@@ -7,8 +7,10 @@
                 <goal>exec:java</goal>
             </goals>
             <properties>
-                <mainClass>ProducerApp</mainClass>
-                <oracle.jms.traceLevel>6</oracle.jms.traceLevel>
+                <exec.mainClass>org.bsnyder.spring.jms.ProducerApp</exec.mainClass>
+                <javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+                
+                
             </properties>
         </action>
         <action>
@@ -19,7 +21,8 @@
             </goals>
             <properties>
                 <exec.mainClass>org.bsnyder.spring.jms.ConsumerApp</exec.mainClass>
-                <oracle.jms.traceLevel>6</oracle.jms.traceLevel>
+                <javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+                
             </properties>
         </action>
     </actions>
