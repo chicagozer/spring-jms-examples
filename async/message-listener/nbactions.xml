@@ -21,6 +21,7 @@
             </goals>
             <properties>
                 <exec.mainClass>org.bsnyder.spring.jms.ConsumerApp</exec.mainClass>
+                <javax.xml.parsers.SAXParserFactory>org.apache.xerces.jaxp.SAXParserFactoryImpl</javax.xml.parsers.SAXParserFactory>
                 <javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
                 
             </properties>

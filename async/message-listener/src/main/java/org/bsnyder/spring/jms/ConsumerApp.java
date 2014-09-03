@@ -30,7 +30,7 @@ public class ConsumerApp {
     public static void main(String[] args) throws InterruptedException,JMSException {
     	ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("/META-INF/spring/consumer-jms-context.xml", ConsumerApp.class);
     	
-        Thread.sleep(30000);
+        Thread.sleep(300000);
         ((ConfigurableApplicationContext)ac).close();
         // No need to actually do anything beyond loading the app context because
     	// this starts up the Spring message listener container. 

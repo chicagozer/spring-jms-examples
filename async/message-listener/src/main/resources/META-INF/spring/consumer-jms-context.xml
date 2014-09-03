@@ -3,57 +3,94 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:p="http://www.springframework.org/schema/p"
-        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:orcl="http://www.springframework.org/schema/data/orcl"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
      http://www.springframework.org/schema/context 
-      http://www.springframework.org/schema/context/spring-context.xsd">
+      http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/data/orcl
+       http://www.springframework.org/schema/data/orcl/spring-data-orcl-1.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
     
     <context:property-placeholder location="file:${user.home}/jdbc.properties" />
 
     <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
         <property name="environment">
             <props>
-                <!--
-                <prop key="java.naming.provider.url">jnp://localhost:1099</prop>
-                <prop key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</prop>
-                <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop> -->
                 <prop key="java.naming.factory.initial">oracle.jms.AQjmsInitialContextFactory</prop>
-                 <prop key="db_url">${jdbc.url}</prop>
+                <prop key="db_url">${jdbc.url}</prop>
                 <prop key="java.naming.security.principal">${jdbc.principal}</prop>
                 <prop key="java.naming.security.credentials">${jdbc.credentials}</prop>
             </props>
         </property>
     </bean>
     
-    <bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+    <bean id="jmsConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
         <property name="jndiTemplate" ref ="jndiTemplate"/>
         <property name="jndiName" value="QueueConnectionFactory"/>
     </bean>
-  
+    <tx:annotation-driven/>
+
+    <orcl:aq-jms-connection-factory id="connectionFactory"
+                                    use-local-data-source-transaction="true" 
+                                    data-source="dataSource"
+                                    native-jdbc-extractor="oracleNativeJdbcExtractor"/>
+    <!-- Sets up the JMS ConnectionFactory, in this case backed by Oracle AQ -->
+    <bean id="oracleNativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.SimpleNativeJdbcExtractor"/>
    
-  
-    <bean id="messageListener" class="org.bsnyder.spring.jms.listener.SimpleMessageListener" />
-  
-    <bean id="xmlMessageListener" class="org.bsnyder.spring.jms.listener.XMLMessageListener" autowire="byName" />
+ 
+    <!-- Using DataSourceTxManager, but could also be HibernateTxManager or JtaTxManager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.principal}"/>
+        <property name="password" value="${jdbc.credentials}"/>
+    </bean>
+    -->
+    <bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close">
+        <property name="URL" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.principal}"/>
+        <property name="password" value="${jdbc.credentials}"/>
+        <property name="connectionCachingEnabled" value="true" />
+    </bean>
     
-    <bean id="xmlListenerAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
-    <property name="delegate" ref="xmlMessageListener" />
-    <property name="defaultListenerMethod" value="handleMessage" />
-    <property name="messageConverter" ref="xmlMessageConverter" />
-</bean>
+    
+    <bean id="dao" class="org.bsnyder.spring.jdbc.DAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
   
-     <bean id="xmlMessageConverter" 
-   class="org.springframework.data.jdbc.jms.support.converter.oracle.XmlMessageConverter">
-    <constructor-arg>
-        <bean class="org.springframework.data.jdbc.support.oracle.DocumentXmlTypeHandler"/> 
-    </constructor-arg>
-</bean>
+    <bean id="messageListener" class="org.bsnyder.spring.jms.listener.SimpleMessageListener">
+        <property name="dao" ref="dao" />
+    </bean>
+  
+    <bean id="xmlMessageListener" class="org.bsnyder.spring.jms.listener.XMLMessageListener" autowire="byName">
+        <property name="dao" ref="dao" />
+    </bean>
+    <bean id="xmlListenerAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <property name="delegate" ref="xmlMessageListener" />
+        <property name="defaultListenerMethod" value="handleMessage" />
+        <property name="messageConverter" ref="xmlMessageConverter" />
+    </bean>
+  
+    <bean id="xmlMessageConverter" 
+          class="org.springframework.data.jdbc.jms.support.converter.oracle.XmlMessageConverter">
+        <constructor-arg>
+            <bean class="org.springframework.data.jdbc.support.oracle.DocumentXmlTypeHandler"/> 
+        </constructor-arg>
+    </bean>
     
     <bean id="dmlc" abstract="true">
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="sessionTransacted" value="true"/>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="concurrentConsumers" value="1"/>
         <property name="maxConcurrentConsumers" value="4"/>
     </bean>

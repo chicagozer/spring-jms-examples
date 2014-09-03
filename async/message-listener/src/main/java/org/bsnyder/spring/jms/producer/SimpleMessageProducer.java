@@ -1,6 +1,5 @@
 package org.bsnyder.spring.jms.producer;
 
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
@@ -46,18 +45,13 @@ public class SimpleMessageProducer {
         final StringBuilder buffer = new StringBuilder();
 
         for (int i = 0; i < numberOfMessages; ++i) {
-            
-           
+
             buffer.setLength(0);
            // buffer.append("### Message '").append(i).append("' sent at: ").append(new Date());
-            
+
            // for (int k = 0; k < 10000; k++){
-             // buffer.append(" ");
+            // buffer.append(" ");
             //}           
-
-           
-            
-
             String s = String.valueOf(i);
             int hash = 0;
             for (int j = 0; j < s.length(); j++) {
@@ -66,18 +60,17 @@ public class SimpleMessageProducer {
 
             //jmsTemplate.setDefaultDestination(d);
             final String q = "DEMO_QUEUE" + hash;
-            
-             buffer.append("<this>is xml. count:").append(i).append(" q:").append(q).append("</this>");
+
+            buffer.append("<this>is xml. count:").append(i).append(" q:").append(q).append("</this>");
             final int count = i;
             final String payload = buffer.toString();
-            
-            
+
             jmsTemplate.send(q, new MessageCreator() {
                 @Override
                 public Message createMessage(Session session) throws JMSException {
                     TextMessage message = session.createTextMessage(payload);
                     message.setIntProperty("messageCount", count);
-                    LOG.info("Sending message number '{}' queue '{}'", count,q);
+                    LOG.info("Sending message number '{}' queue '{}'", count, q);
                     return message;
                 }
             });
