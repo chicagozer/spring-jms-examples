@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="request">
+    <xs:complexType>
+      <xs:sequence>
+          <xs:element ref="agentType"/>
+        <xs:element ref="agentVersion"/>
+        <xs:element ref="dealerCode"/>
+        <xs:element ref="dealerCodepath"/>
+        <xs:element ref="transactionType"/>
+        <xs:element ref="confirmationKey"/>
+        <xs:element ref="requestId"/>
+        <xs:element ref="schema"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="agentType" type="xs:NCName"/>
+  <xs:element name="agentVersion" type="xs:NCName"/>
+  <xs:element name="dealerCode" type="xs:NCName"/>
+  <xs:element name="dealerCodepath" type="xs:NCName"/>
+  <xs:element name="transactionType" type="xs:NCName"/>
+  <xs:element name="confirmationKey" type="xs:NCName"/>
+  <xs:element name="requestId" type="xs:integer"/>
+  <xs:element name="schema" type="xs:NCName"/>
+</xs:schema>
