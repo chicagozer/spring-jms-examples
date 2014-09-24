@@ -33,7 +33,7 @@ public class DAO {
     public void insert(String last, String first, String email) {
         this.setAppInfo("insert","dao");
         this.jdbcTemplate.update(
-                "insert into AQ_SUBTABLE values (sys_guid(), ?, ?,  ?)",
+                "insert into AQ_SUBTABLE (LAST_NAME, FIRST_NAME, EMAIL) values ( ?, ?,  ?)",
                 last, first, email);
     }
 }

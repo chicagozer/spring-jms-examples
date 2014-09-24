@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.bsnyder.spring.jaxb.data.Person;
+import org.bsnyder.spring.jaxb.data.SimplePerson;
 import org.bsnyder.spring.jdbc.DAO;
 
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class SimpleMessageListener implements MessageListener {
            StringReader reader = new StringReader(text);
  
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                Person p = (Person)jaxbUnmarshaller.unmarshal(reader);
+                SimplePerson p = (SimplePerson)jaxbUnmarshaller.unmarshal(reader);
         
        dao.insert(p.getLASTNAME(), p.getFIRSTNAME(), p.getEMAIL());
             

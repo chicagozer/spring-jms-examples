@@ -1,4 +1,5 @@
 # For STS/Eclipse 
+.svn
 .classpath
 .project
 .settings

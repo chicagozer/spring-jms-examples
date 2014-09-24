@@ -22,16 +22,16 @@
 
   <!-- Standard debug level logging to the console -->
   <appender name="CONSOLE-DEBUG" class="org.apache.log4j.ConsoleAppender">
-    <param name="Threshold" value="debug"/>
+    <param name="Threshold" value="trace"/>
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%-5p [%t] - %-30c{1} - %m%n"/>
+      <param name="ConversionPattern" value="%-5p [%t] - %-30c - %m%n"/>
     </layout>
   </appender>
   
   <!-- Filter only debug log messages to the console -->
   <appender name="ONLY-DEBUG-CONSOLE" class="org.apache.log4j.ConsoleAppender">
     <layout class="org.apache.log4j.PatternLayout">
-       <param name="ConversionPattern" value="%-5p [%t] - %-30c{1} - %m%n"/>
+       <param name="ConversionPattern" value="%-5p [%t] - %-30c - %m%n"/>
     </layout>
     <filter class="org.apache.log4j.varia.LevelMatchFilter">
       <!-- 
@@ -39,7 +39,7 @@
         Filter.ACCEPT for debug statements and prints them; it returns 
         Filter.NEUTRAL for all other statements (i.e., unmatched statements)
       -->
-      <param name="levelToMatch" value="debug"/>
+      <param name="levelToMatch" value="trace"/>
       <param name="acceptOnMatch" value="true"/>
     </filter>
     <!--
@@ -52,7 +52,7 @@
   <!-- Filter only info log messages to the console -->
   <appender name="ONLY-INFO-CONSOLE" class="org.apache.log4j.ConsoleAppender">
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%-5p [%t] - %-30c{1} - %m%n"/>
+      <param name="ConversionPattern" value="%-5p [%t] - %-30c - %m%n"/>
     </layout>
     <filter class="org.apache.log4j.varia.LevelMatchFilter">
       <param name="levelToMatch" value="info"/>
@@ -71,7 +71,7 @@
     <level value="info"/>
   </logger>
   <logger name="org.bsnyder">
-    <level value="info"/>
+    <level value="trace"/>
   </logger>
   
   <!-- 
@@ -81,7 +81,7 @@
    info log statements. 
   -->
   <root>
-    <priority value="debug"/>
+    <priority value="trace"/>
     <appender-ref ref="CONSOLE-DEBUG"/>
   </root>
   

@@ -1,5 +1,10 @@
 package org.bsnyder.spring.jms.producer;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import javax.jms.JMSException;
 
 import org.slf4j.Logger;
@@ -23,7 +28,7 @@ public class XMLSimpleMessageProducer {
         this.jndiTemplate = jndiTemplate;
     }
 
-    protected int numberOfMessages = 100;
+    protected int numberOfMessages = 1;
 
     public void setNumberOfMessages(int numberOfMessages) {
         this.numberOfMessages = numberOfMessages;
@@ -37,7 +42,7 @@ public class XMLSimpleMessageProducer {
         this.jmsTemplate = jmsTemplate;
     }
 
-    public void sendMessages() throws JMSException {
+    public void sendMessages() throws JMSException, IOException, FileNotFoundException {
         final StringBuilder buffer = new StringBuilder();
 
         for (int i = 0; i < numberOfMessages; ++i) {
@@ -55,11 +60,15 @@ public class XMLSimpleMessageProducer {
             }
 
             final String q = "DEMO_XQUEUE" + hash;
-            buffer.append("<this>is xml. count:").append(i).append(" q:").append(q).append("</this>");
+            buffer.append("<SimplePerson><PKID>id</PKID><LAST_NAME>last</LAST_NAME>");
+            buffer.append("<FIRST_NAME>first</FIRST_NAME><EMAIL>test@aol.com</EMAIL></SimplePerson>");
             final int count = i;
-            final String payload = buffer.toString();
-
+            //final String payload = buffer.toString();
+            
+            
+            final String payload = new String(Files.readAllBytes(Paths.get("/Users/jmittler/Downloads/standard.xml")));
             jmsTemplate.convertAndSend(q, payload);
+            //jmsTemplate.convertAndSend(q,is);
             LOG.info("Sending message number '{}' queue '{}'", count, q);
 
         }

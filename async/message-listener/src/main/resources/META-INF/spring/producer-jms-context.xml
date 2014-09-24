@@ -3,12 +3,14 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
         xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
      http://www.springframework.org/schema/context 
-      http://www.springframework.org/schema/context/spring-context.xsd">
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
      <context:property-placeholder location="file:${user.home}/jdbc.properties" />
     
@@ -28,6 +30,9 @@
             </props>
         </property>
     </bean>
+    
+    
+    
     
     <bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
         <property name="jndiTemplate" ref ="jndiTemplate"/>
@@ -65,5 +70,19 @@
         
         <property name="jndiTemplate" ref="jndiTemplate"></property>
     </bean>
-  
+    
+    
+     
+ <aop:aspectj-autoproxy />
+ 
+ <bean id="performanceMonitor" class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
+  <property name="useDynamicLogger" value="true"/>
+ </bean>
+ 
+ <aop:config>
+  <aop:pointcut id="allServiceMethods" expression="execution(* org.bsnyder..*(..))" />
+  <aop:advisor pointcut-ref="allServiceMethods" advice-ref="performanceMonitor" order="2" />
+ </aop:config>
+ 
+
 </beans>

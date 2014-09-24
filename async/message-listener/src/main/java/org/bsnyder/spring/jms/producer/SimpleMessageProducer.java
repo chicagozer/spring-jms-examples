@@ -27,7 +27,7 @@ public class SimpleMessageProducer {
         this.jndiTemplate = jndiTemplate;
     }
 
-    protected int numberOfMessages = 100;
+    protected int numberOfMessages = 0;
 
     public void setNumberOfMessages(int numberOfMessages) {
         this.numberOfMessages = numberOfMessages;
@@ -61,7 +61,23 @@ public class SimpleMessageProducer {
             //jmsTemplate.setDefaultDestination(d);
             final String q = "DEMO_QUEUE" + hash;
 
-            buffer.append("<this>is xml. count:").append(i).append(" q:").append(q).append("</this>");
+            /*
+            
+            <xs:element name="Person">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element type="xs:string" name="PKID"/>
+        <xs:element type="xs:string" name="LAST_NAME"/>
+        <xs:element type="xs:string" name="FIRST_NAME"/>
+        <xs:element type="xs:string" name="EMAIL"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+            */
+            
+            
+            buffer.append("<Person><PKID>id</PKID><LAST_NAME>last</LAST_NAME>");
+            buffer.append("<FIRST_NAME>first</FIRST_NAME><EMAIL>test@aol.com</EMAIL></Person>");
             final int count = i;
             final String payload = buffer.toString();
 
@@ -70,7 +86,7 @@ public class SimpleMessageProducer {
                 public Message createMessage(Session session) throws JMSException {
                     TextMessage message = session.createTextMessage(payload);
                     message.setIntProperty("messageCount", count);
-                    LOG.info("Sending message number '{}' queue '{}'", count, q);
+                    LOG.debug("Sending message number '{}' queue '{}'", count, q);
                     return message;
                 }
             });
