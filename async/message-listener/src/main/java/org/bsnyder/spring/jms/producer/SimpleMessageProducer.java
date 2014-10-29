@@ -1,15 +1,19 @@
 package org.bsnyder.spring.jms.producer;
 
+import java.lang.reflect.InvocationTargetException;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import org.bsnyder.spring.utils.DebugUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jndi.JndiTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
 
 public class SimpleMessageProducer {
 
@@ -27,7 +31,25 @@ public class SimpleMessageProducer {
         this.jndiTemplate = jndiTemplate;
     }
 
-    protected int numberOfMessages = 0;
+    protected int numberOfMessages = 1;
+    protected int pad = 500000;
+    protected int groupSize = 1;
+
+    public int getPad() {
+        return pad;
+    }
+
+    public void setPad(int pad) {
+        this.pad = pad;
+    }
+
+    public int getGroupSize() {
+        return groupSize;
+    }
+
+    public void setGroupSize(int groupSize) {
+        this.groupSize = groupSize;
+    }
 
     public void setNumberOfMessages(int numberOfMessages) {
         this.numberOfMessages = numberOfMessages;
@@ -40,8 +62,18 @@ public class SimpleMessageProducer {
     public void setJmsTemplate(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
     }
+    
+    public void sendGroup() throws JMSException, InvocationTargetException
+    {
+        for (int i=0;i<groupSize;i++)
+            sendMessages();
+    }
 
-    public void sendMessages() throws JMSException {
+    @Transactional(rollbackFor=JMSException.class)
+    public void sendMessages() throws JMSException, InvocationTargetException {
+        
+         //DebugUtils.transactionRequired("SimpleMessageProducer.sendMessages");
+         
         final StringBuilder buffer = new StringBuilder();
 
         for (int i = 0; i < numberOfMessages; ++i) {
@@ -76,8 +108,11 @@ public class SimpleMessageProducer {
             */
             
             
-            buffer.append("<Person><PKID>id</PKID><LAST_NAME>last</LAST_NAME>");
-            buffer.append("<FIRST_NAME>first</FIRST_NAME><EMAIL>test@aol.com</EMAIL></Person>");
+            buffer.append("<SimplePerson><PKID>id</PKID><LAST_NAME>last</LAST_NAME>");
+            buffer.append("<FIRST_NAME>first</FIRST_NAME>");
+            for (int k=0;k<pad;k++)
+                buffer.append(" ");
+            buffer.append("<EMAIL>test@aol.com</EMAIL></SimplePerson>");
             final int count = i;
             final String payload = buffer.toString();
 
@@ -91,6 +126,8 @@ public class SimpleMessageProducer {
                 }
             });
         }
+        //let's barf
+       //throw new JMSException("barf");
     }
 
 }

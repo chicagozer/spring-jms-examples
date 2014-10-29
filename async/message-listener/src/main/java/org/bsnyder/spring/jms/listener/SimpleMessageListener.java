@@ -14,6 +14,7 @@ import org.bsnyder.spring.jdbc.DAO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 public class SimpleMessageListener implements MessageListener {
     
@@ -30,12 +31,13 @@ public class SimpleMessageListener implements MessageListener {
     }
     
     @Override
+    @Transactional
     public void onMessage(Message message) {
         try {
             String text = ((TextMessage)message).getText();
             LOG.info("Received message: {}", text);
             
-           JAXBContext jaxbContext = JAXBContext.newInstance(Person.class);
+           JAXBContext jaxbContext = JAXBContext.newInstance(SimplePerson.class);
            StringReader reader = new StringReader(text);
  
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();

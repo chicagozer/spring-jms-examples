@@ -6,9 +6,11 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:orcl="http://www.springframework.org/schema/data/orcl"
        xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
      http://www.springframework.org/schema/context 
       http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/data/orcl
@@ -64,6 +66,15 @@
         <property name="password" value="${jdbc.credentials}"/>
     </bean>
     -->
+    
+      
+    <bean id="dataSource2" class="org.springframework.jndi.JndiObjectFactoryBean" lazy-init="false">
+        <property name="jndiName" value="java:comp/env/jdbc/xddw" />
+        <property name="lookupOnStartup" value="false"/>
+        <property name="proxyInterface" value="javax.sql.DataSource"/>
+    </bean>
+    
+    
     <bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close">
         <property name="URL" value="${jdbc.url}"/>
         <property name="user" value="${jdbc.principal}"/>
@@ -215,5 +226,17 @@
         <property name="destinationName" value="DEMO_XQUEUE9"/>
     </bean>
     
+    
+   <aop:aspectj-autoproxy proxy-target-class="true"/>
+ 
+    <bean id="performanceMonitor" class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
+        <property name="useDynamicLogger" value="true"/>
+    </bean>
+ 
+    <aop:config>
+        <aop:pointcut id="allServiceMethods" expression="execution(* org.bsnyder..*(..))" />
+        <aop:advisor pointcut-ref="allServiceMethods" advice-ref="performanceMonitor" order="2" />
+    </aop:config>
+ 
     
 </beans>

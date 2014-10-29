@@ -28,7 +28,7 @@ public class XMLSimpleMessageProducer {
         this.jndiTemplate = jndiTemplate;
     }
 
-    protected int numberOfMessages = 1;
+    protected int numberOfMessages = 0;
 
     public void setNumberOfMessages(int numberOfMessages) {
         this.numberOfMessages = numberOfMessages;
