@@ -71,17 +71,22 @@
             <artifactId>jta</artifactId>
             <version>1.1</version>
         </dependency>
+        
+        <!--
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>11.2.0.2-1.6</version>
         </dependency>
+        -->
 
+<!--
         <dependency>
             <groupId>oracle</groupId>  
             <artifactId>aqapi</artifactId>  
             <version>11.2.0.4</version> 
         </dependency>
+        -->
         
         <dependency>
             <groupId>com.oracle</groupId>  
@@ -90,7 +95,6 @@
         </dependency>
         
        
-        
         <dependency>
             <groupId>com.oracle.xml</groupId>
             <artifactId>oracle.xml</artifactId>
@@ -121,7 +125,16 @@
 	<artifactId>fscontext</artifactId>
 	<version>4.5-b25</version>
 </dependency>
-
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>aqapi</artifactId>
+            <version>11.2.0.3</version>
+        </dependency>
     </dependencies>
 
     <build>
