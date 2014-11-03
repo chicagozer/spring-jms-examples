@@ -63,14 +63,14 @@ public class SimpleMessageProducer {
         this.jmsTemplate = jmsTemplate;
     }
     
-    public void sendGroup() throws JMSException, InvocationTargetException
+    public void sendGroup() 
     {
         for (int i=0;i<groupSize;i++)
             sendMessages();
     }
 
-    @Transactional(rollbackFor=JMSException.class)
-    public void sendMessages() throws JMSException, InvocationTargetException {
+    @Transactional
+    public void sendMessages() {
         
          //DebugUtils.transactionRequired("SimpleMessageProducer.sendMessages");
          

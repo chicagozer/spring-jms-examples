@@ -32,17 +32,12 @@ public class ProducerApp {
         ApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/spring/producer-jms-context.xml", ProducerApp.class);
         SimpleMessageProducer producer = (SimpleMessageProducer) context.getBean("messageProducer");
 
-        for (int i = 1; i <= 501; i += 50) {
-            producer.setGroupSize(i);
-            for (int j = 0; j <= 500000; j += 100000) {
-                producer.setPad(j);
-                for (int k = 1; k <= 101; k += 20) {
-                    producer.setNumberOfMessages(k);
+        producer.setGroupSize(1);
+          producer.setPad(50000);
+          producer.setNumberOfMessages(10);
 
                     producer.sendGroup();
-                }
-            }
-        }
+      
 
         XMLSimpleMessageProducer xproducer = (XMLSimpleMessageProducer) context.getBean("xmlMessageProducer");
         xproducer.sendMessages();

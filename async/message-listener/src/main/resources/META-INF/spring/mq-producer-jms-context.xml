@@ -34,10 +34,9 @@
                <prop key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</prop>
                <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop>
                 -->
-                <prop key="java.naming.factory.initial">oracle.jms.AQjmsInitialContextFactory</prop>
-                <prop key="db_url">${jdbc.url}</prop>
-                <prop key="java.naming.security.principal">${jdbc.principal}</prop>
-                <prop key="java.naming.security.credentials">${jdbc.credentials}</prop>
+                <prop key="java.naming.factory.initial">com.sun.jndi.fscontext.RefFSContextFactory</prop>
+                <prop key="java.naming.provider.url">${java.naming.provider.url}</prop>
+                
                
             </props>
         </property>
@@ -51,19 +50,11 @@
     </bean>
     
     
-    <bean id="jmsConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+    <bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
         <property name="jndiTemplate" ref ="jndiTemplate"/>
         <!-- <property name="jndiName" value="/ConnectionFactory"/> -->
         <property name="jndiName" value="QueueConnectionFactory"/> 
     </bean>
-  
-   <orcl:aq-jms-connection-factory id="connectionFactory"
-                                    use-local-data-source-transaction="true" 
-                                    data-source="dataSource"
-                                    native-jdbc-extractor="oracleNativeJdbcExtractor"/>
-    <!-- Sets up the JMS ConnectionFactory, in this case backed by Oracle AQ -->
-    <bean id="oracleNativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.SimpleNativeJdbcExtractor"/>
-   
   
    
       
@@ -75,14 +66,7 @@
     <bean id="xmljmsTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="connectionFactory" ref="connectionFactory"/> 
         <property name="sessionTransacted" value="true"/>
-        <property name="messageConverter">
-            <bean id="messageConverter"
-                class="org.springframework.data.jdbc.jms.support.converter.oracle.XmlMessageConverter">
-                <constructor-arg>
-                  <bean class="org.bsnyder.spring.utils.StringXmlTypeHandler"/> 
-                </constructor-arg>
-            </bean>
-        </property>
+        
     </bean>
     
   

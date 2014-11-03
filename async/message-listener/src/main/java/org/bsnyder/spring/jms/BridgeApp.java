@@ -16,9 +16,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author bsnyder
  *
  */
-public class ConsumerApp {
+public class BridgeApp {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(ConsumerApp.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BridgeApp.class);
     
     /**
      * Run the app and tell the producer to send its messages. 
@@ -28,7 +28,7 @@ public class ConsumerApp {
      * @throws JMSException
      */
     public static void main(String[] args) throws InterruptedException,JMSException {
-    	ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("/META-INF/spring/mq-consumer-jms-context.xml", ConsumerApp.class);
+    	ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("/META-INF/spring/bridge-context.xml", BridgeApp.class);
     	
         Thread.sleep(300000);
         ((ConfigurableApplicationContext)ac).close();

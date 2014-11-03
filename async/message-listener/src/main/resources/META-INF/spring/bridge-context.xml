@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:orcl="http://www.springframework.org/schema/data/orcl"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+     http://www.springframework.org/schema/context 
+      http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/data/orcl
+       http://www.springframework.org/schema/data/orcl/spring-data-orcl-1.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+    
+    <context:property-placeholder location="file:${user.home}/jdbc.properties" />
+
+    <bean id="jndiTemplateOracle" class="org.springframework.jndi.JndiTemplate">
+        <property name="environment">
+            <props>
+                <prop key="java.naming.factory.initial">oracle.jms.AQjmsInitialContextFactory</prop>
+                <prop key="db_url">${jdbc.url}</prop>
+                <prop key="java.naming.security.principal">${jdbc.principal}</prop>
+                <prop key="java.naming.security.credentials">${jdbc.credentials}</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="jndiTemplateMQ" class="org.springframework.jndi.JndiTemplate">
+        <property name="environment">
+            <props>
+                <!--
+               <prop key="java.naming.provider.url">jnp://localhost:1099</prop>
+               <prop key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</prop>
+               <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop>
+                -->
+                <prop key="java.naming.factory.initial">com.sun.jndi.fscontext.RefFSContextFactory</prop>
+                <prop key="java.naming.provider.url">${java.naming.provider.url}</prop>
+                
+               
+            </props>
+        </property>
+    </bean>
+    
+    
+   
+    <tx:annotation-driven/>
+    
+    <bean id="dataSource" class="oracle.jdbc.xa.client.OracleXADataSource" destroy-method="close">
+        <property name="URL" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.principal}"/>
+        <property name="password" value="${jdbc.credentials}"/>
+        <property name="connectionCachingEnabled" value="true" />
+    </bean>
+
+    <orcl:aq-jms-connection-factory id="connectionFactory"
+                                    use-local-data-source-transaction="true" 
+                                    data-source="dataSource"
+                                    native-jdbc-extractor="oracleNativeJdbcExtractor"/>
+    <!-- Sets up the JMS ConnectionFactory, in this case backed by Oracle AQ -->
+    <bean id="oracleNativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.SimpleNativeJdbcExtractor"/>
+   
+ 
+    <!-- Using DataSourceTxManager, but could also be HibernateTxManager or JtaTxManager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <bean id="connectionFactoryMQ" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiTemplate" ref ="jndiTemplateMQ"/>
+        <!-- <property name="jndiName" value="/ConnectionFactory"/> -->
+        <property name="jndiName" value="XAQueueConnectionFactory"/> 
+    </bean>
+    
+   <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"
+          p:connectionFactory-ref="connectionFactoryMQ"
+          p:messageConverter-ref="xmlMessageConverterMQ"
+         p:sessionTransacted="true"    />
+   
+    <bean id="messageListener" class="org.bsnyder.spring.jms.listener.BridgeListener">
+      <property name="jmsTemplate" ref="jmsTemplate" />
+        <property name="jndiTemplate" ref="jndiTemplateMQ" />
+    </bean>
+    
+   
+    <bean id="xmlMessageListener" class="org.bsnyder.spring.jms.listener.XMLBridgeListener" autowire="byName">
+        <property name="jmsTemplate" ref="jmsTemplate" />
+        <property name="jndiTemplate" ref="jndiTemplateMQ" />
+    </bean>
+   
+    
+    
+    <bean id="xmlListenerAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <property name="delegate" ref="xmlMessageListener" />
+        <property name="defaultListenerMethod" value="handleMessage" />
+        <property name="messageConverter" ref="xmlMessageConverterDocument" />
+    </bean>
+    
+    <!-- JEM flip this depending on Doc vs Stream -->
+    
+    <bean id="xmlMessageConverterMQ"
+    class="org.bsnyder.spring.jms.listener.XMLMessageConverter" />
+  
+    <bean id="xmlMessageConverterDocument" 
+          class="org.springframework.data.jdbc.jms.support.converter.oracle.XmlMessageConverter">
+        <constructor-arg>
+            <bean class="org.springframework.data.jdbc.support.oracle.DocumentXmlTypeHandler"/> 
+        </constructor-arg>
+    </bean>
+    
+    <bean id="xmlMessageConverterStream" 
+          class="org.springframework.data.jdbc.jms.support.converter.oracle.XmlMessageConverter">
+        <constructor-arg>
+            <bean class="org.springframework.data.jdbc.support.oracle.StreamXmlTypeHandler"/> 
+        </constructor-arg>
+    </bean>
+    
+    <bean id="dmlc" abstract="true">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="sessionTransacted" value="true"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="concurrentConsumers" value="1"/>
+        <property name="maxConcurrentConsumers" value="4"/>
+        <property name="errorHandler" ref="xmlMessageListener" />
+    </bean>
+     
+    <bean id="dmlcsimple" abstract="true" parent="dmlc" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="messageListener" ref="messageListener" />
+    </bean>
+     
+    <bean id="dmlcxml" abstract="true" parent="dmlc" class="org.springframework.data.jdbc.jms.listener.oracle.XmlMessageListenerContainer" >
+        <property name="messageListener" ref="xmlListenerAdapter" />
+        <!--     <property name="messageConverter" ref="messageConverter" /> -->
+    </bean>
+
+    <bean id="messageConverter" 
+          class="org.springframework.data.jdbc.jms.support.converter.oracle.XmlMessageConverter">
+        <constructor-arg>
+            <bean class="org.springframework.data.jdbc.support.oracle.DocumentXmlTypeHandler"/> 
+        </constructor-arg>
+    </bean>
+    
+    <bean id="jmsContainer1"  parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE1"/>
+        
+    </bean>
+    
+    <bean id="xjmsContainer1" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE1"/>
+    </bean>
+ 
+    
+    
+   <aop:aspectj-autoproxy proxy-target-class="true"/>
+ 
+    <bean id="performanceMonitor" class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
+        <property name="useDynamicLogger" value="true"/>
+    </bean>
+ 
+    <aop:config>
+        <aop:pointcut id="allServiceMethods" expression="execution(* org.bsnyder..*(..))" />
+        <aop:advisor pointcut-ref="allServiceMethods" advice-ref="performanceMonitor" order="2" />
+    </aop:config>
+ 
+    
+</beans>
+

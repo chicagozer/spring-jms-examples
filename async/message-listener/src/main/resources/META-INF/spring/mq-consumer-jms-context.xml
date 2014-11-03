@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:orcl="http://www.springframework.org/schema/data/orcl"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+     http://www.springframework.org/schema/context 
+      http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/data/orcl
+       http://www.springframework.org/schema/data/orcl/spring-data-orcl-1.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+    
+    <context:property-placeholder location="file:${user.home}/jdbc.properties" />
+
+   <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+        <property name="environment">
+            <props>
+                <!--
+               <prop key="java.naming.provider.url">jnp://localhost:1099</prop>
+               <prop key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</prop>
+               <prop key="java.naming.factory.url.pkgs">org.jboss.naming:org.jnp.interfaces</prop>
+                -->
+                <prop key="java.naming.factory.initial">com.sun.jndi.fscontext.RefFSContextFactory</prop>
+                <prop key="java.naming.provider.url">${java.naming.provider.url}</prop>
+                
+               
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiTemplate" ref ="jndiTemplate"/>
+        <!-- <property name="jndiName" value="/ConnectionFactory"/> -->
+        <property name="jndiName" value="XAQueueConnectionFactory"/> 
+    </bean>
+  
+    <tx:annotation-driven/>
+
+    
+ 
+    <!-- Using DataSourceTxManager, but could also be HibernateTxManager or JtaTxManager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    
+   <!-- 
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.principal}"/>
+        <property name="password" value="${jdbc.credentials}"/>
+    </bean>
+    
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.principal}"/>
+        <property name="password" value="${jdbc.credentials}"/>
+    </bean>
+    -->
+    
+      
+    <bean id="dataSource2" class="org.springframework.jndi.JndiObjectFactoryBean" lazy-init="false">
+        <property name="jndiName" value="java:comp/env/jdbc/xddw" />
+        <property name="lookupOnStartup" value="false"/>
+        <property name="proxyInterface" value="javax.sql.DataSource"/>
+    </bean>
+    
+    
+    <bean id="dataSource" class="${jdbc.datasource}" destroy-method="close">
+        <property name="URL" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.principal}"/>
+        <property name="password" value="${jdbc.credentials}"/>
+        <property name="connectionCachingEnabled" value="true" />
+    </bean>
+    
+    
+    <bean id="dao" class="org.bsnyder.spring.jdbc.DAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+  
+    <bean id="messageListener" class="org.bsnyder.spring.jms.listener.SimpleMessageListener">
+        <property name="dao" ref="dao" />
+    </bean>
+  
+   <bean id="xmlMessageListener" class="org.bsnyder.spring.jms.listener.XMLMessageListener" autowire="byName">
+        <property name="dao" ref="dao" />
+    </bean>
+    
+    <bean id="xmlMessageConverter" class="org.bsnyder.spring.jms.listener.XMLMessageConverter" autowire="byName">
+        
+    </bean>
+    
+  <bean id="xmlListenerAdapter" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <property name="delegate" ref="xmlMessageListener" />
+        <property name="defaultListenerMethod" value="handleMessage" />
+        <property name="messageConverter" ref="xmlMessageConverter" />
+    </bean>
+    
+    
+    
+    
+    <bean id="dmlc" abstract="true">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="sessionTransacted" value="true"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="concurrentConsumers" value="1"/>
+        <property name="maxConcurrentConsumers" value="4"/>
+    <!--    <property name="errorHandler" ref="xmlMessageListener" /> -->
+    </bean>
+     
+    <bean id="dmlcsimple" abstract="true" parent="dmlc" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="messageListener" ref="messageListener" />
+    </bean>
+     
+     <bean id="dmlcxml" abstract="true" parent="dmlc" class="org.springframework.jms.listener.DefaultMessageListenerContainer" >
+        <property name="messageListener" ref="xmlListenerAdapter" />
+        <!--     <property name="messageConverter" ref="messageConverter" /> -->
+    </bean>
+
+    
+    <bean id="jmsContainer1"  parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE1"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer2"  parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE2"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer3" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE3"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer4" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE4"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer5"  parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE5"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer6"  parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE6"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer7" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE7"/>
+        
+    </bean>
+    <bean id="jmsContainer8"  parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE8"/>
+        
+    </bean>
+    <bean id="jmsContainer9"  parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE9"/>
+        
+    </bean>
+    
+    <bean id="jmsContainer0" parent="dmlcsimple">
+        <property name="destinationName" value="DEMO_QUEUE0"/>
+        
+    </bean>
+    
+   <bean id="xjmsContainer0" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE0"/>
+    </bean>
+     
+    <bean id="xjmsContainer1" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE1"/>
+    </bean>
+ 
+    <bean id="xjmsContainer2"  parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE2"/>
+    </bean>
+ 
+    <bean id="xjmsContainer3"  parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE3"/>
+    </bean>
+ 
+    <bean id="xjmsContainer4" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE4"/>
+    </bean>
+ 
+    <bean id="xjmsContainer5" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE5"/>
+    </bean>
+ 
+    <bean id="xjmsContainer6"  parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE6"/>
+    </bean>
+ 
+    <bean id="xjmsContainer7" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE7"/>
+    </bean>
+ 
+    <bean id="xjmsContainer8" parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE8"/>
+    </bean>
+    <bean id="xjmsContainer9"  parent="dmlcxml">
+        <property name="destinationName" value="DEMO_XQUEUE9"/>
+    </bean>
+    
+   <aop:aspectj-autoproxy proxy-target-class="true"/>
+ 
+    <bean id="performanceMonitor" class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
+        <property name="useDynamicLogger" value="true"/>
+    </bean>
+ 
+    <aop:config>
+        <aop:pointcut id="allServiceMethods" expression="execution(* org.bsnyder..*(..))" />
+        <aop:advisor pointcut-ref="allServiceMethods" advice-ref="performanceMonitor" order="2" />
+    </aop:config>
+ 
+    
+</beans>
